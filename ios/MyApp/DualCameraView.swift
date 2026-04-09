@@ -124,6 +124,20 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
         addGestureRecognizer(tap)
+        
+        // Add observers for debugging
+        NotificationCenter.default.addObserver(self, selector: #selector(sessionStarted), name: .AVCaptureSessionDidStartRunning, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(sessionFailed), name: .AVCaptureSessionRuntimeError, object: nil)
+    }
+    
+    @objc private func sessionStarted() {
+        print("CAMERA NOTIFICATION: Session is now officially running")
+    }
+    
+    @objc private func sessionFailed(notification: NSNotification) {
+        if let error = notification.userInfo?[AVCaptureSessionErrorKey] as? AVError {
+            print("CAMERA NOTIFICATION ERROR: Session failed with error: \(error.localizedDescription)")
+        }
     }
     
     override func layoutSubviews() {
@@ -150,6 +164,24 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
     
     
     private func setupSessionInternal() {
+        print("CAMERA: Checking permissions...")
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            self.proceedWithSetup()
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
+                if granted {
+                    self?.sessionQueue.async { self?.proceedWithSetup() }
+                } else {
+                    print("CAMERA ERROR: Permission denied by user")
+                }
+            }
+        default:
+            print("CAMERA ERROR: Permission state is \(AVCaptureDevice.authorizationStatus(for: .video))")
+        }
+    }
+    
+    private func proceedWithSetup() {
         if let multi = multicamSession, multi.isRunning { multi.stopRunning() }
         if let single = singleSession, single.isRunning { single.stopRunning() }
         
@@ -281,7 +313,7 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
         // Step 5: Output
         if session.canAddOutput(movieOutput) {
             session.addOutputWithNoConnections(movieOutput)
-            let movieConnection = AVCaptureConnection(inputPort: primaryPort, output: movieOutput)
+            let movieConnection = AVCaptureConnection(inputPorts: [primaryPort], output: movieOutput)
             if session.canAddConnection(movieConnection) { 
                 session.addConnection(movieConnection) 
             }
