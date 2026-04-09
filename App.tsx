@@ -170,7 +170,11 @@ function App() {
              </View>
              <View style={{ gap: 12 }}>
                 <TouchableOpacity style={styles.camCircleBtn}><Text style={{color:'#fff'}}>⚙️</Text></TouchableOpacity>
-                <TouchableOpacity onPress={handleFlip} style={styles.camCircleBtn}><Text style={{color:'#fff'}}>🔄</Text></TouchableOpacity>
+                {!isDualLens && (
+                  <TouchableOpacity onPress={handleFlip} style={styles.camCircleBtn}>
+                    <Text style={{color:'#fff'}}>🔄</Text>
+                  </TouchableOpacity>
+                )}
              </View>
            </View>
 

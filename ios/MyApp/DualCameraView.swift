@@ -24,7 +24,6 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
     
     @objc var onRecordingStateChanged: RCTDirectEventBlock?
     
-    // MARK: - API Methods
     
     @objc func setIsDualMode(_ dual: Bool) {
         sessionQueue.async { [weak self] in
@@ -115,13 +114,26 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         mainPreviewLayer.frame = bounds
-        let pipWidth = bounds.width * 0.45
-        let pipHeight = pipWidth * (9/16)
-        pipContainer.frame = CGRect(x: 16, y: bounds.height - pipHeight - 160, width: pipWidth, height: pipHeight)
+        
+        // Fix Orientation to Portrait
+        if let connection = mainPreviewLayer.connection, connection.isVideoOrientationSupported {
+            connection.videoOrientation = .portrait
+        }
+        if let pipConn = PiPPreviewLayer.connection, pipConn.isVideoOrientationSupported {
+            pipConn.videoOrientation = .portrait
+        }
+        
+        let pipWidth = bounds.width * 0.40
+        let pipHeight = pipWidth * (16/9) // Portrait 9:16
+        
+        // Centered PiP horizontally
+        pipContainer.frame = CGRect(x: (bounds.width - pipWidth) / 2, 
+                                   y: 120, // Move to top-area center
+                                   width: pipWidth, 
+                                   height: pipHeight)
         PiPPreviewLayer.frame = pipContainer.bounds
     }
     
-    // MARK: - Logic
     
     private func setupSessionInternal() {
         if let multi = multicamSession, multi.isRunning { multi.stopRunning() }
@@ -198,15 +210,13 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
         }
         let mainConnection = AVCaptureConnection(inputPort: primaryPort, videoPreviewLayer: mainPreviewLayer)
         if session.canAddConnection(mainConnection) { session.addConnection(mainConnection) }
-        
-        // 2. Find Best Secondary Device using Apple's official supported hardware sets
+  
         let secondaryPos: AVCaptureDevice.Position = isFront ? .back : .back
         
-        // Use DiscoverySession to get supported combinations
         let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera, .builtInUltraWideCamera, .builtInTelephotoCamera], mediaType: .video, position: .unspecified)
         let validSets = discoverySession.supportedMultiCamDeviceSets.filter { $0.contains(primaryCam) }
         
-        // Find a secondary camera (from the valid sets) that matches our desired position
+
         var secondaryCam: AVCaptureDevice? = nil
         for deviceSet in validSets {
             if let candidate = deviceSet.first(where: { $0.position == secondaryPos && $0 != primaryCam }) {
@@ -228,17 +238,20 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
                 }
             }
         } else {
-            // Secondary camera not supported with this combination
             DispatchQueue.main.async { self.pipContainer.isHidden = true }
         }
         
         if session.canAddOutput(movieOutput) { session.addOutput(movieOutput) }
         
         session.commitConfiguration()
+        
         DispatchQueue.main.async {
             self.mainPreviewLayer.setSessionWithNoConnection(session)
             self.PiPPreviewLayer.setSessionWithNoConnection(session)
+            self.bringSubviewToFront(self.pipContainer)
+            self.bringSubviewToFront(self.focusVisualizer)
         }
+        
         session.startRunning()
         applyCaptureSettings()
     }
@@ -254,7 +267,6 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
                 do {
                     try device.lockForConfiguration()
                     let duration = CMTime(value: 1, timescale: Int32(currentFPS))
-                    // Verify if FPS is supported by current format
                     if device.activeFormat.videoSupportedFrameRateRanges.contains(where: { $0.maxFrameRate >= Double(currentFPS) }) {
                         device.activeVideoMinFrameDuration = duration
                         device.activeVideoMaxFrameDuration = duration
