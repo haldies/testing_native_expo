@@ -11,34 +11,114 @@ import {
   TouchableOpacity,
   Alert,
   requireNativeComponent,
+  UIManager,
+  findNodeHandle,
 } from 'react-native';
 
 const DualCameraView = requireNativeComponent<any>('DualCameraView');
-
-// Memanggil modul Swift yang tadi kita buat
-const { MemoryModule } = NativeModules;
+const { MemoryModule, DualCameraViewManager } = NativeModules;
 
 function App() {
   const [memories, setMemories] = useState<any[]>([]);
   const [showCamera, setShowCamera] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isDualLens, setIsDualLens] = useState(true);
+  const [fps, setFps] = useState(30);
+  const [res, setRes] = useState('1080p');
+  const [isMultiCamSupported, setIsMultiCamSupported] = useState(true);
+  
+  const camRef = React.useRef(null);
 
   useEffect(() => {
     fetchMemories();
+    checkSupport();
   }, []);
+
+  const checkSupport = async () => {
+    try {
+      if (MemoryModule?.checkMultiCamSupport) {
+        const supported = await MemoryModule.checkMultiCamSupport();
+        setIsMultiCamSupported(supported);
+        if (!supported) {
+          setIsDualLens(false);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const fetchMemories = async () => {
     try {
-      if (!MemoryModule) {
-        console.warn("MemoryModule belum terhubung (Hanya berjalan di iOS Native Build).");
-        return;
+      if (MemoryModule?.getMemories) {
+        const data = await MemoryModule.getMemories();
+        setMemories(data);
       }
-      
-      // Mengambil data dari SwiftData via Bridge
-      const data = await MemoryModule.getMemories();
-      setMemories(data);
-    } catch (error) {
-      console.error("Gagal mengambil data dari SwiftData:", error);
+    } catch (e) {
+      console.error(e);
     }
+  };
+
+  const toggleLens = (dual: boolean) => {
+    setIsDualLens(dual);
+    const node = findNodeHandle(camRef.current);
+    if (node) {
+      UIManager.dispatchViewManagerCommand(
+        node,
+        UIManager.getViewManagerConfig('DualCameraView').Commands.setIsDualMode,
+        [dual]
+      );
+    }
+  };
+
+  const handleRecord = () => {
+    const node = findNodeHandle(camRef.current);
+    if (node) {
+      UIManager.dispatchViewManagerCommand(
+        node,
+        UIManager.getViewManagerConfig('DualCameraView').Commands.toggleRecording,
+        []
+      );
+    }
+  };
+
+  const handleFlip = () => {
+    const node = findNodeHandle(camRef.current);
+    if (node) {
+      UIManager.dispatchViewManagerCommand(
+        node,
+        UIManager.getViewManagerConfig('DualCameraView').Commands.flipCamera,
+        []
+      );
+    }
+  };
+
+  const changeFPS = (newFps: number) => {
+    setFps(newFps);
+    const node = findNodeHandle(camRef.current);
+    if (node) {
+      UIManager.dispatchViewManagerCommand(
+        node,
+        UIManager.getViewManagerConfig('DualCameraView').Commands.setFPS,
+        [newFps]
+      );
+    }
+  };
+
+  const changeRes = (newRes: string) => {
+    setRes(newRes);
+    const node = findNodeHandle(camRef.current);
+    if (node) {
+      UIManager.dispatchViewManagerCommand(
+        node,
+        UIManager.getViewManagerConfig('DualCameraView').Commands.setResolution,
+        [newRes]
+      );
+    }
+  };
+
+  const handleRecordingState = (event: any) => {
+    setIsRecording(event.nativeEvent.isRecording);
   };
 
   const handleRefreshShortcuts = async () => {
@@ -54,7 +134,7 @@ function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle={showCamera ? "light-content" : "dark-content"} />
       <View style={styles.header}>
         <Text style={styles.title}>Siri Memories</Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -69,30 +149,52 @@ function App() {
 
       {showCamera ? (
         <View style={StyleSheet.absoluteFill}>
-           <DualCameraView style={StyleSheet.absoluteFill} />
+           <DualCameraView 
+             ref={camRef}
+             style={StyleSheet.absoluteFill} 
+             onRecordingStateChanged={handleRecordingState}
+           />
            
            {/* Top Bar Overlay */}
            <View style={styles.camTopBar}>
              <TouchableOpacity style={styles.camCircleBtn}><Text style={{color:'#fff'}}>⚡</Text></TouchableOpacity>
-             <Text style={styles.camInfoText}>1080p  •  30fps  •  MOV</Text>
-             <TouchableOpacity style={styles.camCircleBtn}><Text style={{color:'#fff'}}>⚙️</Text></TouchableOpacity>
+             <View style={styles.camInfoBadge}>
+                <TouchableOpacity onPress={() => changeRes(res === '1080p' ? '4K' : '1080p')}>
+                  <Text style={styles.camInfoText}>{res}</Text>
+                </TouchableOpacity>
+                <Text style={styles.camInfoText}>  •  </Text>
+                <TouchableOpacity onPress={() => changeFPS(fps === 30 ? 60 : 30)}>
+                  <Text style={styles.camInfoText}>{fps}fps</Text>
+                </TouchableOpacity>
+                <Text style={styles.camInfoText}>  •  MOV</Text>
+             </View>
+             <View style={{ gap: 12 }}>
+                <TouchableOpacity style={styles.camCircleBtn}><Text style={{color:'#fff'}}>⚙️</Text></TouchableOpacity>
+                <TouchableOpacity onPress={handleFlip} style={styles.camCircleBtn}><Text style={{color:'#fff'}}>🔄</Text></TouchableOpacity>
+             </View>
            </View>
 
            {/* Bottom UI Overlay */}
            <View style={styles.camBottomArea}>
               <View style={styles.lensToggleContainer}>
-                <TouchableOpacity style={[styles.lensBtn, {backgroundColor: '#FF9500'}]}>
+                <TouchableOpacity 
+                  onPress={() => isMultiCamSupported && toggleLens(true)}
+                  style={[styles.lensBtn, isDualLens && {backgroundColor: '#FF9500'}, !isMultiCamSupported && {opacity: 0.5}]}
+                >
                   <Text style={styles.lensText}>Dual Lens</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.lensBtn}>
+                <TouchableOpacity 
+                  onPress={() => toggleLens(false)}
+                  style={[styles.lensBtn, !isDualLens && {backgroundColor: '#FF9500'}]}
+                >
                   <Text style={styles.lensText}>Single Lens</Text>
                 </TouchableOpacity>
               </View>
 
               {/* Shutter Button */}
               <View style={styles.shutterContainer}>
-                 <TouchableOpacity style={styles.shutterOuter}>
-                   <View style={styles.shutterInner} />
+                 <TouchableOpacity onPress={handleRecord} style={styles.shutterOuter}>
+                   <View style={[styles.shutterInner, isRecording && { borderRadius: 8, width: 40, height: 40 }]} />
                  </TouchableOpacity>
               </View>
            </View>
@@ -103,6 +205,13 @@ function App() {
            >
              <Text style={styles.closeCamText}>X</Text>
            </TouchableOpacity>
+
+           {/* Orange Guide Frame for Single Lens */}
+           {!isDualLens && (
+             <View style={styles.centerFrameContainer} pointerEvents="none">
+               <View style={styles.orangeFrame} />
+             </View>
+           )}
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
@@ -158,7 +267,7 @@ const styles = StyleSheet.create({
   emptyText: { textAlign: 'center', marginTop: 50, color: '#888' },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -198,14 +307,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  camInfoText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
+  camInfoBadge: {
+    flexDirection: 'row',
     backgroundColor: 'rgba(0,0,0,0.3)',
     paddingVertical: 4,
     paddingHorizontal: 12,
     borderRadius: 12,
+  },
+  camInfoText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
   camBottomArea: {
     position: 'absolute',
@@ -248,6 +360,18 @@ const styles = StyleSheet.create({
     height: 66,
     borderRadius: 33,
     backgroundColor: '#FF3B30',
+  },
+  centerFrameContainer: {
+    ...StyleSheet.absoluteFill,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  orangeFrame: {
+    width: '90%',
+    height: 200,
+    borderWidth: 2,
+    borderColor: '#FF9500',
+    backgroundColor: 'transparent',
   },
 });
 

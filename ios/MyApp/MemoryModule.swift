@@ -1,6 +1,7 @@
 import Foundation
 import React
 import AppIntents
+import AVFoundation
 
 @objc(MemoryModule)
 class MemoryModule: NSObject {
@@ -17,11 +18,13 @@ class MemoryModule: NSObject {
      resolve(memories)
   }
 
-  @objc(refreshShortcuts:reject:)
-  func refreshShortcuts(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    if #available(iOS 16.0, *) {
-      MyAppShortcuts.updateAppShortcutParameters()
-      resolve(true)
+    }
+  }
+
+  @objc(checkMultiCamSupport:reject:)
+  func checkMultiCamSupport(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    if #available(iOS 13.0, *) {
+      resolve(AVCaptureMultiCamSession.isMultiCamSupported)
     } else {
       resolve(false)
     }
