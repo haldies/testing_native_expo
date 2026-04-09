@@ -27,7 +27,7 @@ class Memory {
 struct AddMemoryIntent: AppIntent {
     static var title: LocalizedStringResource = "Add Memory"
     
-    @Parameter(title: "Choose an image", supportedContentTypes: [.image])
+    @Parameter(title: "Choose an image", supportedTypeIdentifiers: ["public.image"])
     var imageFile: IntentFile
     
     @Parameter(title: "Caption")
