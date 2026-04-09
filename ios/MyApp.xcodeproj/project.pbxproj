@@ -15,6 +15,7 @@
 		694AF8DE0FB04C4D9F0D5986 /* MemoryModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2664E46E5D5A48888DA76D32 /* MemoryModule.swift */; };
 		F7578EA5601640BAA4C771AD /* MemoryModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C22FF1FEF3DE4A06AC043A64 /* MemoryModule.m */; };
 		3CCFFC14A3CC4CD19D4772A4 /* MyApp-Bridging-Header.h in Resources */ = {isa = PBXBuildFile; fileRef = 81F7CDDF96D642669F436AB0 /* MyApp-Bridging-Header.h */; };
+		5A5FEFE8C9CE40719A2C2840 /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01F13CB7323A4696BAAE4D29 /* AppIntents.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		2664E46E5D5A48888DA76D32 /* MemoryModule.swift */ = {isa = PBXFileReference; name = "MemoryModule.swift"; path = "MyApp/MemoryModule.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
 		C22FF1FEF3DE4A06AC043A64 /* MemoryModule.m */ = {isa = PBXFileReference; name = "MemoryModule.m"; path = "MyApp/MemoryModule.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
 		81F7CDDF96D642669F436AB0 /* MyApp-Bridging-Header.h */ = {isa = PBXFileReference; name = "MyApp-Bridging-Header.h"; path = "MyApp-Bridging-Header.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
+		01F13CB7323A4696BAAE4D29 /* AppIntents.framework */ = {isa = PBXFileReference; name = "AppIntents.framework"; path = "System/Library/Frameworks/AppIntents.framework"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = wrapper.framework; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,6 +42,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C80B921A6F3F58F76C31292 /* libPods-MyApp.a in Frameworks */,
+				5A5FEFE8C9CE40719A2C2840 /* AppIntents.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,6 +66,7 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				5DCACB8F33CDC322A6C60F78 /* libPods-MyApp.a */,
+				01F13CB7323A4696BAAE4D29 /* AppIntents.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

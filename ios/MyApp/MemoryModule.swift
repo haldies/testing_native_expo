@@ -20,7 +20,7 @@ class MemoryModule: NSObject {
   @objc(refreshShortcuts:reject:)
   func refreshShortcuts(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
     if #available(iOS 16.0, *) {
-      AppShortcutsCenter.shared.updateAppShortcutParameters()
+      AppIntents.AppShortcutsCenter.shared.updateAppShortcutParameters()
       resolve(true)
     } else {
       resolve(false)
