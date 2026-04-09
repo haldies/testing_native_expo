@@ -1,6 +1,5 @@
 import Foundation
 import React
-import AppIntents
 import AVFoundation
 
 @objc(MemoryModule)
@@ -13,19 +12,12 @@ class MemoryModule: NSObject {
 
   @objc(getMemories:reject:)
   func getMemories(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-     let defaults = UserDefaults.standard
-     let memories = defaults.array(forKey: "SiriMemories") as? [[String: Any]] ?? []
-     resolve(memories)
+     resolve([])
   }
 
   @objc(refreshShortcuts:reject:)
   func refreshShortcuts(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-    if #available(iOS 16.0, *) {
-      MyAppShortcuts.updateAppShortcutParameters()
-      resolve(true)
-    } else {
-      resolve(false)
-    }
+     resolve(false)
   }
 
   @objc(checkMultiCamSupport:reject:)
