@@ -9,13 +9,15 @@ struct MyAppShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: AddMemoryIntent(),
             phrases: [
-                "Add a memory in reactnativecli",
-                "Save memory to reactnativecli"
+                "Add a memory in \(.applicationName)",
+                "Save memory to \(.applicationName)"
             ],
             shortTitle: "Add Memory",
             systemImageName: "photo.badge.plus"
         )
     }
+    
+    static var shortcutTileColor: ShortcutTileColor = .orange
 }
 
 // 2. LOGIC INTENT (SIRI)

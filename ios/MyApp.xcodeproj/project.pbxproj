@@ -315,6 +315,7 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				SWIFT_OBJC_BRIDGING_HEADER = "MyApp-Bridging-Header.h";
+				INTENTS_METADATA_GENERATION = YES;
 			};
 			name = Debug;
 		};
@@ -344,6 +345,7 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
 				SWIFT_OBJC_BRIDGING_HEADER = "MyApp-Bridging-Header.h";
+				INTENTS_METADATA_GENERATION = YES;
 			};
 			name = Release;
 		};
@@ -419,6 +421,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "MyApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				INTENTS_METADATA_GENERATION = YES;
 			};
 			name = Debug;
 		};
@@ -487,6 +490,7 @@
 				VALIDATE_PRODUCT = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "MyApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				INTENTS_METADATA_GENERATION = YES;
 			};
 			name = Release;
 		};
