@@ -13,6 +13,7 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
     private var isDual = true
     private var isFront = false
     private var isRecording = false
+    private var isMirrored = false
     private var currentFPS: Int = 30
     private var currentRes: String = "1080p"
     
@@ -56,6 +57,14 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
             guard let self = self else { return }
             self.currentRes = res
             self.setupSessionInternal()
+        }
+    }
+
+    @objc func setIsMirrored(_ mirrored: Bool) {
+        sessionQueue.async { [weak self] in
+            guard let self = self else { return }
+            self.isMirrored = mirrored
+            self.applyCaptureSettings()
         }
     }
     
@@ -123,12 +132,11 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
             pipConn.videoOrientation = .portrait
         }
         
-        let pipWidth = bounds.width * 0.40
-        let pipHeight = pipWidth * (16/9) // Portrait 9:16
+        let pipWidth = bounds.width * 0.45
+        let pipHeight = pipWidth * (9/16) 
         
-        // Centered PiP horizontally
         pipContainer.frame = CGRect(x: (bounds.width - pipWidth) / 2, 
-                                   y: 120, // Move to top-area center
+                                   y: bounds.height - pipHeight - 170, 
                                    width: pipWidth, 
                                    height: pipHeight)
         PiPPreviewLayer.frame = pipContainer.bounds
@@ -275,6 +283,21 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
                 } catch {}
             }
         }
+        
+        // Handle Mirroring on Connections
+        for connection in session.connections {
+            if connection.isVideoMirroringSupported {
+                // Biasanya mirroring cuma untuk kamera depan
+                let isFrontConnection = session.inputs.contains { input in
+                    if let devInput = input as? AVCaptureDeviceInput {
+                        return devInput.device.position == .front
+                    }
+                    return false
+                }
+                connection.isVideoMirrored = isFrontConnection ? isMirrored : false
+            }
+        }
+        
         session.commitConfiguration()
     }
 

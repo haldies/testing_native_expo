@@ -47,6 +47,13 @@ class DualCameraViewManager: RCTViewManager {
     }
   }
 
+  @objc func setIsMirrored(_ node: NSNumber, mirrored: Bool) {
+    self.bridge.uiManager.addUIBlock { (uiManager, viewRegistry) in
+        let view = viewRegistry?[node] as? DualCameraView
+        view?.setIsMirrored(mirrored)
+    }
+  }
+
   override static func requiresMainQueueSetup() -> Bool {
     return true
   }

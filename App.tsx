@@ -13,6 +13,8 @@ import {
   requireNativeComponent,
   UIManager,
   findNodeHandle,
+  Modal,
+  Switch,
 } from 'react-native';
 
 const DualCameraView = requireNativeComponent<any>('DualCameraView');
@@ -26,6 +28,10 @@ function App() {
   const [fps, setFps] = useState(30);
   const [res, setRes] = useState('1080p');
   const [isMultiCamSupported, setIsMultiCamSupported] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [fileFormat, setFileFormat] = useState('MOV');
+  const [isMirrored, setIsMirroredState] = useState(false);
+  const [useWideAngle, setUseWideAngle] = useState(true);
   
   const camRef = React.useRef(null);
 
@@ -117,6 +123,18 @@ function App() {
     }
   };
 
+  const handleMirror = (val: boolean) => {
+    setIsMirroredState(val);
+    const node = findNodeHandle(camRef.current);
+    if (node) {
+      UIManager.dispatchViewManagerCommand(
+        node,
+        UIManager.getViewManagerConfig('DualCameraView').Commands.setIsMirrored,
+        [val]
+      );
+    }
+  };
+
   const handleRecordingState = (event: any) => {
     setIsRecording(event.nativeEvent.isRecording);
   };
@@ -166,10 +184,12 @@ function App() {
                 <TouchableOpacity onPress={() => changeFPS(fps === 30 ? 60 : 30)}>
                   <Text style={styles.camInfoText}>{fps}fps</Text>
                 </TouchableOpacity>
-                <Text style={styles.camInfoText}>  •  MOV</Text>
+                <Text style={styles.camInfoText}>  •  {fileFormat}</Text>
              </View>
              <View style={{ gap: 12 }}>
-                <TouchableOpacity style={styles.camCircleBtn}><Text style={{color:'#fff'}}>⚙️</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowSettings(true)} style={styles.camCircleBtn}>
+                  <Text style={{color:'#fff'}}>⚙️</Text>
+                </TouchableOpacity>
                 {!isDualLens && (
                   <TouchableOpacity onPress={handleFlip} style={styles.camCircleBtn}>
                     <Text style={{color:'#fff'}}>🔄</Text>
@@ -177,6 +197,88 @@ function App() {
                 )}
              </View>
            </View>
+
+           {/* Settings Modal */}
+           <Modal visible={showSettings} animationType="slide" transparent={true}>
+              <SafeAreaView style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                   <View style={styles.modalHeader}>
+                      <Text style={styles.modalTitle}>Settings</Text>
+                      <TouchableOpacity onPress={() => setShowSettings(false)}>
+                        <Text style={styles.doneBtn}>Done</Text>
+                      </TouchableOpacity>
+                   </View>
+
+                   <ScrollView style={{padding: 16}}>
+                      <Text style={styles.sectionTitle}>VIDEO QUALITY</Text>
+                      <View style={styles.toggleGroup}>
+                         {['1080p', '4K'].map(r => (
+                           <TouchableOpacity 
+                             key={r}
+                             onPress={() => changeRes(r)}
+                             style={[styles.toggleItem, res === r && styles.toggleActive]}>
+                             <Text style={styles.toggleText}>{r}</Text>
+                           </TouchableOpacity>
+                         ))}
+                      </View>
+                      <View style={[styles.toggleGroup, {marginTop: 8}]}>
+                         {[24, 30, 60].map(f => (
+                           <TouchableOpacity 
+                             key={f}
+                             onPress={() => changeFPS(f)}
+                             style={[styles.toggleItem, fps === f && styles.toggleActive]}>
+                             <Text style={styles.toggleText}>{f} fps</Text>
+                           </TouchableOpacity>
+                         ))}
+                      </View>
+                      <Text style={styles.infoText}>~137 MB/min (both files)  ~3h 15m available</Text>
+
+                      <Text style={styles.sectionTitle}>FILE FORMAT</Text>
+                      <View style={styles.toggleGroup}>
+                         {['MOV', 'MP4'].map(f => (
+                           <TouchableOpacity 
+                             key={f}
+                             onPress={() => setFileFormat(f)}
+                             style={[styles.toggleItem, fileFormat === f && styles.toggleActive]}>
+                             <Text style={styles.toggleText}>{f}</Text>
+                           </TouchableOpacity>
+                         ))}
+                      </View>
+                      <Text style={styles.infoText}>MOV works best with Apple and pro editing apps.</Text>
+
+                      <Text style={styles.sectionTitle}>CAMERA LENS</Text>
+                      <View style={styles.listRow}>
+                         <Text style={styles.rowLabel}>Use Wide-Angle Lens for Portrait</Text>
+                         <Switch 
+                           value={useWideAngle} 
+                           onValueChange={setUseWideAngle}
+                           trackColor={{ false: "#767577", true: "#FF9500" }}
+                         />
+                      </View>
+
+                      <Text style={styles.sectionTitle}>COMPOSITION</Text>
+                      <View style={styles.listRow}>
+                         <Text style={styles.rowLabel}>Mirror Front Camera</Text>
+                         <Switch 
+                           value={isMirrored} 
+                           onValueChange={handleMirror}
+                           trackColor={{ false: "#767577", true: "#FFD60A" }}
+                         />
+                      </View>
+
+                      <Text style={styles.sectionTitle}>DEVICE</Text>
+                      <View style={styles.listItem}>
+                         <Text style={styles.rowLabel}>MultiCam Support</Text>
+                         <Text style={styles.rowValue}>{isMultiCamSupported ? 'Supported' : 'Not Supported'}</Text>
+                      </View>
+                      <View style={styles.listItem}>
+                         <Text style={styles.rowLabel}>Free Storage</Text>
+                         <Text style={styles.rowValue}>26.4 GB</Text>
+                      </View>
+                   </ScrollView>
+                </View>
+              </SafeAreaView>
+           </Modal>
 
            {/* Bottom UI Overlay */}
            <View style={styles.camBottomArea}>
@@ -311,13 +413,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  camInfoBadge: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-    borderRadius: 12,
-  },
   camInfoText: {
     color: '#fff',
     fontSize: 12,
@@ -329,23 +424,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
-  },
-  lensToggleContainer: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: 20,
-    padding: 2,
-    marginBottom: 30,
-  },
-  lensBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderRadius: 18,
-  },
-  lensText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
   },
   shutterContainer: {
     marginBottom: 20,
@@ -376,6 +454,134 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#FF9500',
     backgroundColor: 'transparent',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.9)',
+  },
+  modalContent: {
+    flex: 1,
+    backgroundColor: '#1C1C1E',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#38383A',
+  },
+  modalTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  doneBtn: {
+    color: '#FFD60A',
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  sectionTitle: {
+    color: '#8E8E93',
+    fontSize: 13,
+    marginTop: 24,
+    marginBottom: 8,
+    marginLeft: 4,
+    textTransform: 'uppercase',
+  },
+  lensToggleContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#2C2C2E',
+    borderRadius: 25,
+    padding: 4,
+    marginBottom: 20,
+    alignSelf: 'center',
+  },
+  lensBtn: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 22,
+  },
+  lensBtnActive: {
+    backgroundColor: '#FF9500',
+  },
+  lensText: {
+    color: '#8E8E93',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  lensTextActive: {
+    color: '#fff',
+  },
+  camTopArea: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    right: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  camInfoBadge: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    alignItems: 'center',
+  },
+  toggleGroup: {
+    flexDirection: 'row',
+    backgroundColor: '#2C2C2E',
+    borderRadius: 8,
+    padding: 2,
+  },
+  toggleItem: {
+    flex: 1,
+    paddingVertical: 8,
+    alignItems: 'center',
+    borderRadius: 6,
+  },
+  toggleActive: {
+    backgroundColor: '#636366',
+  },
+  toggleText: {
+    color: '#fff',
+    fontSize: 15,
+  },
+  infoText: {
+    color: '#8E8E93',
+    fontSize: 12,
+    marginTop: 8,
+    marginLeft: 4,
+  },
+  listRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#2C2C2E',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 8,
+  },
+  listItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#2C2C2E',
+    padding: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#38383A',
+  },
+  rowLabel: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  rowValue: {
+    color: '#8E8E93',
+    fontSize: 16,
   },
 });
 
