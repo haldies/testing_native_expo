@@ -88,8 +88,14 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-        sessionQueue.async { [weak self] in
-            self?.setupSessionInternal()
+    }
+    
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        if window != nil {
+            sessionQueue.async { [weak self] in
+                self?.setupSessionInternal()
+            }
         }
     }
     
@@ -146,6 +152,13 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
     private func setupSessionInternal() {
         if let multi = multicamSession, multi.isRunning { multi.stopRunning() }
         if let single = singleSession, single.isRunning { single.stopRunning() }
+        
+        // Clear Layers to prevent stale connections
+        DispatchQueue.main.async {
+            self.mainPreviewLayer.session = nil
+            self.PiPPreviewLayer.session = nil
+        }
+        
         multicamSession = nil
         singleSession = nil
         
@@ -192,13 +205,22 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
     }
     
     private func setupMultiCamInternal() {
+        print("CAMERA: Starting MultiCam Setup...")
+        
         let session = AVCaptureMultiCamSession()
         self.multicamSession = session
+        
+        // Step 1: Pre-assign session to layers BEFORE configuration
+        mainPreviewLayer.setSessionWithNoConnection(session)
+        PiPPreviewLayer.setSessionWithNoConnection(session)
+        
         session.beginConfiguration()
         
+        // Step 2: Primary Input
         let primaryPos: AVCaptureDevice.Position = isFront ? .front : .back
         guard let primaryCam = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: primaryPos),
               let primaryInput = try? AVCaptureDeviceInput(device: primaryCam) else {
+            print("CAMERA ERROR: Failed to get primary camera input")
             session.commitConfiguration()
             setupSingleCamInternal()
             return
@@ -207,24 +229,29 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
         if session.canAddInput(primaryInput) { 
             session.addInputWithNoConnections(primaryInput) 
         } else {
+            print("CAMERA ERROR: Cannot add primary input to MultiCamSession")
             session.commitConfiguration()
             setupSingleCamInternal()
             return
         }
         
+        // Step 3: Primary Connection
         guard let primaryPort = primaryInput.ports.first(where: { $0.mediaType == .video }) else {
+            print("CAMERA ERROR: Primary camera has no video port")
             session.commitConfiguration()
             return
         }
         let mainConnection = AVCaptureConnection(inputPort: primaryPort, videoPreviewLayer: mainPreviewLayer)
-        if session.canAddConnection(mainConnection) { session.addConnection(mainConnection) }
-  
-        let secondaryPos: AVCaptureDevice.Position = isFront ? .back : .back
+        if session.canAddConnection(mainConnection) { 
+            session.addConnection(mainConnection) 
+            print("CAMERA SUCCESS: Main connection added")
+        }
         
+        // Step 4: Secondary Device Discovery
+        let secondaryPos: AVCaptureDevice.Position = isFront ? .back : .back
         let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera, .builtInUltraWideCamera, .builtInTelephotoCamera], mediaType: .video, position: .unspecified)
         let validSets = discoverySession.supportedMultiCamDeviceSets.filter { $0.contains(primaryCam) }
         
-
         var secondaryCam: AVCaptureDevice? = nil
         for deviceSet in validSets {
             if let candidate = deviceSet.first(where: { $0.position == secondaryPos && $0 != primaryCam }) {
@@ -242,25 +269,39 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
                 let pipConnection = AVCaptureConnection(inputPort: secondPort, videoPreviewLayer: PiPPreviewLayer)
                 if session.canAddConnection(pipConnection) {
                     session.addConnection(pipConnection)
+                    print("CAMERA SUCCESS: PiP connection added")
                     DispatchQueue.main.async { self.pipContainer.isHidden = false }
                 }
             }
         } else {
+            print("CAMERA WARNING: No compatible secondary camera found for this device set")
             DispatchQueue.main.async { self.pipContainer.isHidden = true }
         }
         
-        if session.canAddOutput(movieOutput) { session.addOutput(movieOutput) }
+        // Step 5: Output
+        if session.canAddOutput(movieOutput) {
+            session.addOutputWithNoConnections(movieOutput)
+            let movieConnection = AVCaptureConnection(inputPort: primaryPort, output: movieOutput)
+            if session.canAddConnection(movieConnection) { 
+                session.addConnection(movieConnection) 
+            }
+        }
+        
+        // Step 6: Validate Hardware Cost
+        print("CAMERA: Hardware Cost = \(session.hardwareCost)")
+        if session.hardwareCost > 1.0 {
+            print("CAMERA CRITICAL: Hardware cost (\(session.hardwareCost)) exceeds limits! Expect black screen.")
+        }
         
         session.commitConfiguration()
         
         DispatchQueue.main.async {
-            self.mainPreviewLayer.setSessionWithNoConnection(session)
-            self.PiPPreviewLayer.setSessionWithNoConnection(session)
             self.bringSubviewToFront(self.pipContainer)
             self.bringSubviewToFront(self.focusVisualizer)
         }
         
         session.startRunning()
+        print("CAMERA: MultiCam session started. Running status: \(session.isRunning)")
         applyCaptureSettings()
     }
     
