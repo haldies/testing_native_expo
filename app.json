@@ -1,6 +1,6 @@
 {
-  "name": "reactnativecli",
-  "displayName": "reactnativecli",
+  "name": "MyApp",
+  "displayName": "MyApp",
   "extra": {
     "eas": {
       "projectId": "c3a30271-2acd-47af-b0b9-0377225f9b21"

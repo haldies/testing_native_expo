@@ -14,6 +14,7 @@
 		F9F977AA2A374F6B9EC8DA84 /* AddMemoryIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574D265B29044B9CAD16CD14 /* AddMemoryIntent.swift */; };
 		694AF8DE0FB04C4D9F0D5986 /* MemoryModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2664E46E5D5A48888DA76D32 /* MemoryModule.swift */; };
 		F7578EA5601640BAA4C771AD /* MemoryModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C22FF1FEF3DE4A06AC043A64 /* MemoryModule.m */; };
+		3CCFFC14A3CC4CD19D4772A4 /* MyApp-Bridging-Header.h in Resources */ = {isa = PBXBuildFile; fileRef = 81F7CDDF96D642669F436AB0 /* MyApp-Bridging-Header.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		574D265B29044B9CAD16CD14 /* AddMemoryIntent.swift */ = {isa = PBXFileReference; name = "AddMemoryIntent.swift"; path = "MyApp/AddMemoryIntent.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
 		2664E46E5D5A48888DA76D32 /* MemoryModule.swift */ = {isa = PBXFileReference; name = "MemoryModule.swift"; path = "MyApp/MemoryModule.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
 		C22FF1FEF3DE4A06AC043A64 /* MemoryModule.m */ = {isa = PBXFileReference; name = "MemoryModule.m"; path = "MyApp/MemoryModule.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
+		81F7CDDF96D642669F436AB0 /* MyApp-Bridging-Header.h */ = {isa = PBXFileReference; name = "MyApp-Bridging-Header.h"; path = "MyApp-Bridging-Header.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +85,7 @@
 				574D265B29044B9CAD16CD14 /* AddMemoryIntent.swift */,
 				2664E46E5D5A48888DA76D32 /* MemoryModule.swift */,
 				C22FF1FEF3DE4A06AC043A64 /* MemoryModule.m */,
+				81F7CDDF96D642669F436AB0 /* MyApp-Bridging-Header.h */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 				F9F977AA2A374F6B9EC8DA84 /* AddMemoryIntent.swift in Sources */,
 				694AF8DE0FB04C4D9F0D5986 /* MemoryModule.swift in Sources */,
 				F7578EA5601640BAA4C771AD /* MemoryModule.m in Sources */,
+				3CCFFC14A3CC4CD19D4772A4 /* MyApp-Bridging-Header.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
