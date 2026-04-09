@@ -11,6 +11,9 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		F9F977AA2A374F6B9EC8DA84 /* AddMemoryIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 574D265B29044B9CAD16CD14 /* AddMemoryIntent.swift */; };
+		694AF8DE0FB04C4D9F0D5986 /* MemoryModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2664E46E5D5A48888DA76D32 /* MemoryModule.swift */; };
+		F7578EA5601640BAA4C771AD /* MemoryModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C22FF1FEF3DE4A06AC043A64 /* MemoryModule.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +27,9 @@
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = MyApp/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = MyApp/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		574D265B29044B9CAD16CD14 /* AddMemoryIntent.swift */ = {isa = PBXFileReference; name = "AddMemoryIntent.swift"; path = "MyApp/AddMemoryIntent.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		2664E46E5D5A48888DA76D32 /* MemoryModule.swift */ = {isa = PBXFileReference; name = "MemoryModule.swift"; path = "MyApp/MemoryModule.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		C22FF1FEF3DE4A06AC043A64 /* MemoryModule.m */ = {isa = PBXFileReference; name = "MemoryModule.m"; path = "MyApp/MemoryModule.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +80,9 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				574D265B29044B9CAD16CD14 /* AddMemoryIntent.swift */,
+				2664E46E5D5A48888DA76D32 /* MemoryModule.swift */,
+				C22FF1FEF3DE4A06AC043A64 /* MemoryModule.m */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -245,6 +254,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
+				F9F977AA2A374F6B9EC8DA84 /* AddMemoryIntent.swift in Sources */,
+				694AF8DE0FB04C4D9F0D5986 /* MemoryModule.swift in Sources */,
+				F7578EA5601640BAA4C771AD /* MemoryModule.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,7 +283,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tes.reactnativecli";
 				PRODUCT_NAME = MyApp;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -300,7 +312,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tes.reactnativecli";
 				PRODUCT_NAME = MyApp;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SWIFT_VERSION = 5.0;
