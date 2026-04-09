@@ -52,17 +52,37 @@ class DualCameraView: UIView {
     }
     
     private func setupSession() {
-        guard AVCaptureMultiCamSession.isMultiCamSupported else {
-            print("MultiCam not supported on this device")
-            return
+        if AVCaptureMultiCamSession.isMultiCamSupported {
+            setupMultiCamSession()
+        } else {
+            setupSingleCamSession()
+        }
+    }
+    
+    private func setupSingleCamSession() {
+        let singleSession = AVCaptureSession()
+        guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+              let input = try? AVCaptureDeviceInput(device: camera) else { return }
+              
+        if singleSession.canAddInput(input) {
+            singleSession.addInput(input)
         }
         
+        mainPreviewLayer.session = singleSession
+        pipContainer.isHidden = true // Sembunyikan PiP jika tidak support dual camera
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            singleSession.startRunning()
+        }
+    }
+    
+    private func setupMultiCamSession() {
         let session = AVCaptureMultiCamSession()
         self.session = session
         
         session.beginConfiguration()
         
-        // 1. Wide Angle Camera (Main)
+        // 1. Setup Main Camera (Wide)
         guard let wideCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
               let wideInput = try? AVCaptureDeviceInput(device: wideCamera) else { return }
         
@@ -70,26 +90,34 @@ class DualCameraView: UIView {
             session.addInputWithNoConnections(wideInput)
         }
         
-        // 2. Ultra Wide Camera (Secondary/PiP)
-        guard let ultraWideCamera = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back),
-              let ultraWideInput = try? AVCaptureDeviceInput(device: ultraWideCamera) else { return }
-
-        if session.canAddInput(ultraWideInput) {
-            session.addInputWithNoConnections(ultraWideInput)
-        }
-        
-        // Connect Wide to Main Preview
+        mainPreviewLayer.setSessionWithNoConnection(session)
         let widePort = wideInput.ports.first(where: { $0.mediaType == .video })!
         let mainConnection = AVCaptureConnection(inputPort: widePort, videoPreviewLayer: mainPreviewLayer)
         if session.canAddConnection(mainConnection) {
             session.addConnection(mainConnection)
         }
         
-        // Connect UltraWide to PiP Preview
-        let ultraWidePort = ultraWideInput.ports.first(where: { $0.mediaType == .video })!
-        let pipConnection = AVCaptureConnection(inputPort: ultraWidePort, videoPreviewLayer: PiPPreviewLayer)
-        if session.canAddConnection(pipConnection) {
-            session.addConnection(pipConnection)
+        // 2. Setup PiP Camera (UltraWide or Tele)
+        let secondaryDevice = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back) ?? 
+                              AVCaptureDevice.default(.builtInTelephotoCamera, for: .video, position: .back)
+                              
+        if let secondCam = secondaryDevice,
+           let ultraWideInput = try? AVCaptureDeviceInput(device: secondCam) {
+            
+            if session.canAddInput(ultraWideInput) {
+                session.addInputWithNoConnections(ultraWideInput)
+                
+                PiPPreviewLayer.setSessionWithNoConnection(session)
+                let ultraWidePort = ultraWideInput.ports.first(where: { $0.mediaType == .video })!
+                let pipConnection = AVCaptureConnection(inputPort: ultraWidePort, videoPreviewLayer: PiPPreviewLayer)
+                
+                if session.canAddConnection(pipConnection) {
+                    session.addConnection(pipConnection)
+                    pipContainer.isHidden = false
+                }
+            }
+        } else {
+            pipContainer.isHidden = true
         }
         
         session.commitConfiguration()

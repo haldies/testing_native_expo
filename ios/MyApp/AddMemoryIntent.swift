@@ -9,8 +9,8 @@ struct MyAppShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: AddMemoryIntent(),
             phrases: [
-                "Add a memory in \(.applicationName)",
-                "Save memory to \(.applicationName)"
+                "Add a memory in reactnativecli",
+                "Save memory to reactnativecli"
             ],
             shortTitle: "Add Memory",
             systemImageName: "photo.badge.plus"
