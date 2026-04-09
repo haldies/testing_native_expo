@@ -18,6 +18,13 @@ class MemoryModule: NSObject {
      resolve(memories)
   }
 
+  @objc(refreshShortcuts:reject:)
+  func refreshShortcuts(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    if #available(iOS 16.0, *) {
+      MyAppShortcuts.updateAppShortcutParameters()
+      resolve(true)
+    } else {
+      resolve(false)
     }
   }
 
