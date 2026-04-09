@@ -290,6 +290,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
+				SWIFT_OBJC_BRIDGING_HEADER = "MyApp-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -318,6 +319,7 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
+				SWIFT_OBJC_BRIDGING_HEADER = "MyApp-Bridging-Header.h";
 			};
 			name = Release;
 		};
@@ -391,6 +393,8 @@
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "MyApp-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -457,6 +461,8 @@
 				);
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "MyApp-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
