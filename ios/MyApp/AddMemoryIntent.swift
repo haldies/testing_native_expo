@@ -2,7 +2,6 @@ import Foundation
 import AppIntents
 import UIKit
 
-// 1. INI KUNCINYA AGAR MUNCUL DI APLIKASI SHORTCUTS & SIRI!
 @available(iOS 16.0, *)
 struct MyAppShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {

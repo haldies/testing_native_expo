@@ -192,15 +192,19 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
             return
         }
         
-        let primaryPort = primaryInput.ports.first { $0.mediaType == .video }!
+        guard let primaryPort = primaryInput.ports.first(where: { $0.mediaType == .video }) else {
+            session.commitConfiguration()
+            return
+        }
         let mainConnection = AVCaptureConnection(inputPort: primaryPort, videoPreviewLayer: mainPreviewLayer)
         if session.canAddConnection(mainConnection) { session.addConnection(mainConnection) }
         
         // 2. Find Best Secondary Device using Apple's official supported hardware sets
         let secondaryPos: AVCaptureDevice.Position = isFront ? .back : .back
         
-        // Filter hardware combinations that contain our primary camera
-        let validSets = AVCaptureMultiCamSession.supportedMultiCamDeviceSets.filter { $0.contains(primaryCam) }
+        // Use DiscoverySession to get supported combinations
+        let discoverySession = AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera, .builtInUltraWideCamera, .builtInTelephotoCamera], mediaType: .video, position: .unspecified)
+        let validSets = discoverySession.supportedMultiCamDeviceSets.filter { $0.contains(primaryCam) }
         
         // Find a secondary camera (from the valid sets) that matches our desired position
         var secondaryCam: AVCaptureDevice? = nil
@@ -212,10 +216,11 @@ class DualCameraView: UIView, AVCaptureFileOutputRecordingDelegate {
         }
         
         if let secondCam = secondaryCam,
-           let secondInput = try? AVCaptureDeviceInput(device: secondCam) {
+           let secondInput = try? AVCaptureDeviceInput(device: secondCam),
+           let secondPort = secondInput.ports.first(where: { $0.mediaType == .video }) {
+            
             if session.canAddInput(secondInput) {
                 session.addInputWithNoConnections(secondInput)
-                let secondPort = secondInput.ports.first { $0.mediaType == .video }!
                 let pipConnection = AVCaptureConnection(inputPort: secondPort, videoPreviewLayer: PiPPreviewLayer)
                 if session.canAddConnection(pipConnection) {
                     session.addConnection(pipConnection)
