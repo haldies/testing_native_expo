@@ -16,6 +16,10 @@
 		F7578EA5601640BAA4C771AD /* MemoryModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C22FF1FEF3DE4A06AC043A64 /* MemoryModule.m */; };
 		3CCFFC14A3CC4CD19D4772A4 /* MyApp-Bridging-Header.h in Resources */ = {isa = PBXBuildFile; fileRef = 81F7CDDF96D642669F436AB0 /* MyApp-Bridging-Header.h */; };
 		5A5FEFE8C9CE40719A2C2840 /* AppIntents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01F13CB7323A4696BAAE4D29 /* AppIntents.framework */; };
+		6DC178F556304C27B5540190 /* DualCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D74BB9BFB0DE4149B5A0EDD6 /* DualCameraView.swift */; };
+		5FEC40F951E14D1194865AE1 /* DualCameraViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6297876F2FBA4BD7A4F7EA06 /* DualCameraViewManager.swift */; };
+		F7CC21A2F88B4B1ABC898FE3 /* DualCameraViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9FEC94CF193A497FB59DC56C /* DualCameraViewManager.m */; };
+		94767402F2E244C3B8157B4D /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F26EA4D247F14202B05C8A0B /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +38,10 @@
 		C22FF1FEF3DE4A06AC043A64 /* MemoryModule.m */ = {isa = PBXFileReference; name = "MemoryModule.m"; path = "MyApp/MemoryModule.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
 		81F7CDDF96D642669F436AB0 /* MyApp-Bridging-Header.h */ = {isa = PBXFileReference; name = "MyApp-Bridging-Header.h"; path = "MyApp-Bridging-Header.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
 		01F13CB7323A4696BAAE4D29 /* AppIntents.framework */ = {isa = PBXFileReference; name = "AppIntents.framework"; path = "System/Library/Frameworks/AppIntents.framework"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = wrapper.framework; explicitFileType = undefined; includeInIndex = 0; };
+		D74BB9BFB0DE4149B5A0EDD6 /* DualCameraView.swift */ = {isa = PBXFileReference; name = "DualCameraView.swift"; path = "MyApp/DualCameraView.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		6297876F2FBA4BD7A4F7EA06 /* DualCameraViewManager.swift */ = {isa = PBXFileReference; name = "DualCameraViewManager.swift"; path = "MyApp/DualCameraViewManager.swift"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.swift; explicitFileType = undefined; includeInIndex = 0; };
+		9FEC94CF193A497FB59DC56C /* DualCameraViewManager.m */ = {isa = PBXFileReference; name = "DualCameraViewManager.m"; path = "MyApp/DualCameraViewManager.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
+		F26EA4D247F14202B05C8A0B /* AVFoundation.framework */ = {isa = PBXFileReference; name = "AVFoundation.framework"; path = "System/Library/Frameworks/AVFoundation.framework"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = wrapper.framework; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,6 +51,7 @@
 			files = (
 				0C80B921A6F3F58F76C31292 /* libPods-MyApp.a in Frameworks */,
 				5A5FEFE8C9CE40719A2C2840 /* AppIntents.framework in Frameworks */,
+				94767402F2E244C3B8157B4D /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -67,6 +76,7 @@
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				5DCACB8F33CDC322A6C60F78 /* libPods-MyApp.a */,
 				01F13CB7323A4696BAAE4D29 /* AppIntents.framework */,
+				F26EA4D247F14202B05C8A0B /* AVFoundation.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -90,6 +100,9 @@
 				2664E46E5D5A48888DA76D32 /* MemoryModule.swift */,
 				C22FF1FEF3DE4A06AC043A64 /* MemoryModule.m */,
 				81F7CDDF96D642669F436AB0 /* MyApp-Bridging-Header.h */,
+				D74BB9BFB0DE4149B5A0EDD6 /* DualCameraView.swift */,
+				6297876F2FBA4BD7A4F7EA06 /* DualCameraViewManager.swift */,
+				9FEC94CF193A497FB59DC56C /* DualCameraViewManager.m */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -265,6 +278,9 @@
 				694AF8DE0FB04C4D9F0D5986 /* MemoryModule.swift in Sources */,
 				F7578EA5601640BAA4C771AD /* MemoryModule.m in Sources */,
 				3CCFFC14A3CC4CD19D4772A4 /* MyApp-Bridging-Header.h in Resources */,
+				6DC178F556304C27B5540190 /* DualCameraView.swift in Sources */,
+				5FEC40F951E14D1194865AE1 /* DualCameraViewManager.swift in Sources */,
+				F7CC21A2F88B4B1ABC898FE3 /* DualCameraViewManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
