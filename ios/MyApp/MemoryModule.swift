@@ -1,5 +1,6 @@
 import Foundation
 import React
+import AppIntents
 
 @objc(MemoryModule)
 class MemoryModule: NSObject {
@@ -11,11 +12,18 @@ class MemoryModule: NSObject {
 
   @objc(getMemories:reject:)
   func getMemories(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
-     // Mengambil data murni dari UserDefaults, Tanpa iOS 17 Requirement
      let defaults = UserDefaults.standard
      let memories = defaults.array(forKey: "SiriMemories") as? [[String: Any]] ?? []
-     
-     // Kirim array lansung ke JavaScript React Native
      resolve(memories)
+  }
+
+  @objc(refreshShortcuts:reject:)
+  func refreshShortcuts(resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    if #available(iOS 16.0, *) {
+      AppShortcutsCenter.shared.updateAppShortcutParameters()
+      resolve(true)
+    } else {
+      resolve(false)
+    }
   }
 }

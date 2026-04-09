@@ -8,6 +8,8 @@ import {
   NativeModules,
   ScrollView,
   Image,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
 
 // Memanggil modul Swift yang tadi kita buat
@@ -35,11 +37,25 @@ function App() {
     }
   };
 
+  const handleRefreshShortcuts = async () => {
+    try {
+      if (MemoryModule?.refreshShortcuts) {
+        await MemoryModule.refreshShortcuts();
+        Alert.alert("Sukses", "Siri Shortcuts telah didaftarkan ke sistem iPhone! Silakan cek aplikasi Shortcuts sekarang.");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <View style={styles.header}>
         <Text style={styles.title}>Siri Memories</Text>
+        <TouchableOpacity onPress={handleRefreshShortcuts} style={styles.shortcutBtn}>
+           <Text style={styles.btnText}>Daftarkan Siri Shortcut</Text>
+        </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.list}>
         {memories.length === 0 ? (
@@ -68,8 +84,27 @@ function App() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F2F2F7' },
-  header: { padding: 16, backgroundColor: '#fff', borderBottomWidth: 1, borderColor: '#eee' },
-  title: { fontSize: 24, fontWeight: 'bold' },
+  header: { 
+    padding: 16, 
+    backgroundColor: '#fff', 
+    borderBottomWidth: 1, 
+    borderColor: '#eee',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  title: { fontSize: 20, fontWeight: 'bold' },
+  shortcutBtn: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  btnText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
   list: { padding: 16, gap: 16 },
   emptyText: { textAlign: 'center', marginTop: 50, color: '#888' },
   card: {
